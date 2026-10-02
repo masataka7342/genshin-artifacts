@@ -1,0 +1,65 @@
+/* Custom Styling for Genshin KQM Artifact Evaluator */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+:root {
+  --genshin-gold: #e5b967;
+  --genshin-gold-glow: rgba(229, 185, 103, 0.4);
+  --genshin-dark: #0f141f;
+  --genshin-card-bg: rgba(23, 31, 48, 0.85);
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background-color: #0b0f19;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(30, 41, 59, 0.6) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.8) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(19, 26, 43, 0.5) 0px, transparent 100%);
+  color: #f1f5f9;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* 原神風のゴールドカード効果 */
+.artifact-card-glow {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(229, 185, 103, 0.35);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 20px -5px var(--genshin-gold-glow);
+}
+
+.artifact-header-gold {
+  background: linear-gradient(90deg, #d97706 0%, #b45309 60%, #78350f 100%);
+}
+
+/* スクロールバー装飾 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 185, 103, 0.5);
+}
+
+/* アニメーション */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(229, 185, 103, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(229, 185, 103, 0.5);
+  }
+}
+
+.glow-animation {
+  animation: pulseGlow 3s infinite ease-in-out;
+}

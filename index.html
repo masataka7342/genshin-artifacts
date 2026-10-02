@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原神 聖遺物 原神Wiki推奨ビルド AI診断 & オプティマイザー</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen text-slate-100 flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 to-amber-300 flex items-center justify-center shadow-lg shadow-amber-500/20 text-slate-950 font-black text-xl font-cinzel">
+          ✦
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+              原神 聖遺物 原神Wiki推奨ビルド AI診断 & オプティマイザー
+            </h1>
+            <span class="text-[11px] px-2 py-0.5 rounded-full font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+              原神Wiki 準拠
+            </span>
+          </div>
+          <p class="text-xs text-slate-400">スクショから所持聖遺物を解析し、原神Wiki推奨ビルドに最も合う「最強の5部位」を自動選定！</p>
+        </div>
+      </div>
+
+      <!-- API Key Settings -->
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-700/60 rounded-lg px-3 py-1.5 text-xs shadow-inner">
+          <i data-lucide="key" class="w-3.5 h-3.5 text-amber-400"></i>
+          <input id="api-key-input" type="password" placeholder="Gemini API Key (任意)" class="bg-transparent border-none text-slate-200 focus:outline-none w-40 placeholder:text-slate-500">
+          <button id="btn-save-key" class="px-2 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-medium transition">保存</button>
+        </div>
+        <span id="key-status" class="text-xs text-slate-400 hidden sm:inline">未設定（プリセットで試せます）</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <div class="bg-slate-900/50 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2">
+        <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500/20 text-amber-300 border border-amber-500/50 shadow-lg shadow-amber-500/10 flex items-center gap-2" data-tab="optimizer">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> 5部位ベスト装備 自動選定
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent flex items-center gap-2 transition" data-tab="single">
+          <i data-lucide="search" class="w-4 h-4"></i> 個別聖遺物 診断
+        </button>
+        <button class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 border border-transparent flex items-center gap-2 transition" data-tab="inventory">
+          <i data-lucide="package" class="w-4 h-4"></i> 所持聖遺物プール (<span id="inv-total-count">18</span>個)
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs">
+        <button id="btn-re-optimize" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1.5 transition">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 最適化を再計算
+        </button>
+        <button id="btn-reset-inventory" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 transition">
+          手持ち初期化
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- Left Column: Character Target & KQM Guide (4 Cols) -->
+    <div class="lg:col-span-4 flex flex-col gap-5">
+      
+      <!-- Character Selector Card -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+          <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">
+            診断対象キャラクター (現環境Meta)
+          </label>
+          <span id="char-filtered-count" class="text-[11px] text-amber-400 font-bold">全30名</span>
+        </div>
+
+        <!-- 検索バー -->
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-slate-500 pointer-events-none"></i>
+          <input id="char-search-input" type="text" placeholder="キャラ名で絞り込み (例: シロネン, 召使, マーヴィカ...)" class="w-full bg-slate-950/80 border border-slate-700/80 text-slate-200 text-xs rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:border-amber-400 placeholder:text-slate-500 transition shadow-inner">
+        </div>
+
+        <!-- 元素フィルターチップ -->
+        <div class="flex flex-wrap gap-1" id="element-filter-chips">
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/50" data-elem="ALL">ALL</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Pyro">炎</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Hydro">水</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Anemo">風</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Electro">雷</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Dendro">草</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Cryo">氷</button>
+          <button class="elem-chip px-2.5 py-1 rounded-lg text-[10px] font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700" data-elem="Geo">岩</button>
+        </div>
+
+        <!-- キャラクタードロップダウン -->
+        <div class="relative">
+          <select id="character-select" class="w-full bg-slate-800/90 border border-slate-700 text-slate-100 font-bold text-sm sm:text-base rounded-xl px-4 py-3 appearance-none focus:outline-none focus:border-amber-400 transition cursor-pointer shadow-inner">
+            <!-- JavaScriptで自動挿入 -->
+          </select>
+          <i data-lucide="chevron-down" class="w-5 h-5 absolute right-4 top-3.5 text-slate-400 pointer-events-none"></i>
+        </div>
+      </div>
+
+      <!-- KQM Build Guide Display -->
+      <div class="p-5 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl flex-1 flex flex-col gap-4">
+        
+        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span id="char-name-display" class="text-2xl font-black text-amber-200">フリーナ</span>
+              <span id="char-element-badge" class="px-2 py-0.5 rounded text-xs font-bold bg-sky-500/20 text-sky-300 border border-sky-500/30">Hydro</span>
+            </div>
+            <p id="char-en-name" class="text-xs text-slate-400">Furina</p>
+          </div>
+          <div class="text-right">
+            <span id="char-role-badge" class="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-amber-400 border border-amber-500/30">
+              Sub-DPS / Buffer
+            </span>
+            <div class="mt-1">
+              <a id="char-kqm-link" href="https://wikiwiki.jp/genshinwiki/%E3%83%95%E3%83%AA%E3%83%BC%E3%83%8A" target="_blank" rel="noopener noreferrer" class="text-[11px] text-sky-400 hover:text-sky-300 flex items-center justify-end gap-1 underline underline-offset-2">
+                原神Wiki個別ページを見る <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 推奨セット -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-1.5">
+            <i data-lucide="shield" class="w-3.5 h-3.5 text-amber-400"></i> 原神Wiki 推奨聖遺物セット
+          </h3>
+          <div id="char-best-sets" class="flex flex-col gap-2">
+            <!-- JavaScriptで挿入 -->
+          </div>
+        </div>
+
+        <!-- メインステータス推奨 -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 mb-2 flex items-center gap-1.5">
+            <i data-lucide="crosshair" class="w-3.5 h-3.5 text-amber-400"></i> 原神Wiki 各部位推奨メインステータス
+          </h3>
+          <div class="grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="p-2 rounded-lg bg-slate-800/60 border border-slate-700/50">
+              <span class="block text-slate-400 font-medium text-[10px] mb-1">砂 (時計)</span>
+              <span id="char-sands-main" class="font-bold text-amber-300 text-[11px]">HP% / チャージ</span>
+            </div>
+            <div class="p-2 rounded-lg bg-slate-800/60 border border-slate-700/50">
+              <span class="block text-slate-400 font-medium text-[10px] mb-1">杯</span>
+              <span id="char-goblet-main" class="font-bold text-amber-300 text-[11px]">水バフ / HP%</span>
+            </div>
+            <div class="p-2 rounded-lg bg-slate-800/60 border border-slate-700/50">
+              <span class="block text-slate-400 font-medium text-[10px] mb-1">冠</span>
+              <span id="char-circlet-main" class="font-bold text-amber-300 text-[11px]">会心率 / ダメ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- サブステ優先度 & ER要求 -->
+        <div class="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs flex flex-col gap-2">
+          <div class="flex items-start gap-2">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">Tier S (最優先)</span>
+            <span id="char-sub-s" class="text-slate-200 font-medium leading-relaxed">会心率, 会心ダメージ, 元素チャージ効率</span>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0">Tier A (優先)</span>
+            <span id="char-sub-a" class="text-slate-300 leading-relaxed">HP%</span>
+          </div>
+          <div class="border-t border-slate-800/60 pt-2 flex items-start gap-2">
+            <span class="text-slate-400 shrink-0 font-medium">⚡ 要求ER:</span>
+            <span id="char-er-req" class="text-amber-200 font-medium">180-220% (ソロ水)</span>
+          </div>
+        </div>
+
+        <!-- 原神Wiki解説 -->
+        <div class="p-3 rounded-xl bg-amber-950/20 border border-amber-900/40 text-xs">
+          <span class="font-bold text-amber-400 flex items-center gap-1 mb-1">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> 原神Wiki ビルド解説・運用ポイント
+          </span>
+          <p id="char-kqm-tips" class="text-slate-300 leading-relaxed text-[11px]"></p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Column: Mode Content (8 Cols) -->
+    <div class="lg:col-span-8 flex flex-col gap-5">
+
+      <!-- Upload Banner (共通) -->
+      <div class="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl">
+        <div class="flex justify-between items-center mb-2">
+          <h2 class="text-xs font-bold text-slate-300 flex items-center gap-1.5 uppercase tracking-wider">
+            <i data-lucide="camera" class="w-3.5 h-3.5 text-amber-400"></i>
+            インベントリ / 聖遺物スクショを追加（複数枚同時アップロード対応）
+          </h2>
+          <span class="text-[11px] text-slate-400">Ctrl + V 貼り付け可</span>
+        </div>
+
+        <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-amber-400/80 rounded-xl p-4 text-center cursor-pointer transition bg-slate-950/40 flex items-center justify-center gap-3">
+          <input type="file" id="file-input" class="hidden" accept="image/*" multiple>
+          <div class="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-amber-400 shrink-0 border border-slate-700">
+            <i data-lucide="upload-cloud" class="w-5 h-5"></i>
+          </div>
+          <div class="text-left">
+            <p class="text-xs font-bold text-slate-200">ここに聖遺物またはインベントリのスクショをドロップ</p>
+            <p class="text-[11px] text-slate-400">複数枚まとめて選択可能。AIが自動認識して所持聖遺物プールに追加します。</p>
+          </div>
+        </div>
+
+        <!-- Scan Status Bar -->
+        <div id="scan-status" class="hidden mt-3 p-2.5 rounded-lg bg-slate-800/90 border border-slate-700 flex items-center gap-3 text-xs">
+          <div id="scan-spinner" class="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-slate-200 font-medium">解析中...</span>
+        </div>
+      </div>
+
+      <!-- TAB 1: 5部位ベスト装備 オプティマイザー (Default) -->
+      <section id="section-optimizer" class="flex flex-col gap-4">
+        
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3 mb-4">
+            <div>
+              <span class="text-[11px] font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                <i data-lucide="award" class="w-3.5 h-3.5"></i> 原神Wiki 最適ビルド選定結果
+              </span>
+              <h3 id="opt-verdict-text" class="text-base font-bold text-slate-100 mt-0.5">
+                所持聖遺物から最適な5部位を自動選定中...
+              </h3>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <div class="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-center">
+                <span class="text-[10px] text-slate-400 block font-bold">合計 CV</span>
+                <span id="opt-total-cv" class="text-base font-black font-mono text-amber-300">0.0</span>
+              </div>
+              <div class="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/60 text-center">
+                <span class="text-[10px] text-slate-400 block font-bold">有効ロール数</span>
+                <span id="opt-total-rv" class="text-base font-black font-mono text-emerald-300">0 回</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 発動セット効果バッジ -->
+          <div class="mb-4 flex items-center gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 text-xs">
+            <span class="text-slate-400 font-medium">発動セット効果:</span>
+            <span id="opt-active-set" class="font-bold text-amber-300">計算中...</span>
+          </div>
+
+          <div id="optimizer-alerts" class="mb-3"></div>
+
+          <!-- 5部位のスロットグリッド -->
+          <div id="optimizer-slots" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <!-- JavaScriptで5部位カードを生成 -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 2: 個別聖遺物 診断 -->
+      <section id="section-single" class="hidden flex flex-col gap-4">
+        
+        <!-- サンプル選択ボタン -->
+        <div class="flex flex-wrap items-center gap-2 p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs">
+          <span class="text-slate-400 font-medium">プリセット個別テスト:</span>
+          <button class="sample-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-index="0">劇団・花</button>
+          <button class="sample-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-index="1">劇団・HP時計</button>
+          <button class="sample-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-index="2">ファントム・水杯</button>
+          <button class="sample-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-index="3">ファントム・会心ダメ冠</button>
+          <button class="sample-btn px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition" data-index="4">絶縁・会心率冠</button>
+        </div>
+
+        <!-- Artifact Visual Card -->
+        <div id="artifact-card-container" class="artifact-card-glow rounded-2xl overflow-hidden shadow-2xl">
+          <div class="artifact-header-gold px-4 py-2.5 flex justify-between items-center text-slate-950 font-black">
+            <div class="flex items-center gap-2">
+              <span id="art-slot-badge" class="bg-slate-950 text-amber-300 px-2 py-0.5 rounded text-xs font-bold">生の花</span>
+              <span id="art-set-name" class="text-sm tracking-wide text-white drop-shadow">黄金の劇団</span>
+            </div>
+            <span id="art-level-badge" class="px-2 py-0.5 rounded bg-slate-950/80 text-amber-300 font-mono text-xs font-black">+20</span>
+          </div>
+
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div class="border-b md:border-b-0 md:border-r border-slate-800/80 pb-3 md:pb-0 md:pr-4">
+              <span class="text-xs text-slate-400 font-medium block mb-1">メインステータス</span>
+              <div id="art-main-stat-name" class="text-lg font-bold text-slate-200">HP</div>
+              <div id="art-main-stat-val" class="text-3xl font-black font-cinzel text-amber-300">4,780</div>
+            </div>
+
+            <div>
+              <span class="text-xs text-slate-400 font-medium block mb-1.5">サブステータス</span>
+              <div id="art-substats-list" class="grid grid-cols-1 gap-1.5"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evaluation Report -->
+        <div id="evaluation-result" class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-2xl flex flex-col gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-3">
+              <div id="eval-rank-badge" class="px-4 py-1.5 rounded-full text-base font-black border bg-amber-500/20 text-amber-300 border-amber-400">
+                RANK SSS
+              </div>
+              <div>
+                <span class="text-xs text-slate-400 block font-medium">適合スコア</span>
+                <span class="text-2xl font-black font-cinzel text-amber-300">
+                  <span id="eval-score-num">95</span> / 100
+                </span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="px-3 py-1.5 rounded-lg bg-slate-800 text-center">
+                <span class="text-[10px] text-slate-400 block font-bold">CV</span>
+                <span id="eval-cv" class="text-sm font-bold text-amber-300 font-mono">0.0</span>
+              </div>
+              <div class="px-3 py-1.5 rounded-lg bg-slate-800 text-center">
+                <span class="text-[10px] text-slate-400 block font-bold">有効RV</span>
+                <span id="eval-effective-rolls" class="text-sm font-bold text-emerald-300 font-mono">0 回</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex justify-between items-center">
+              <span class="text-slate-400 font-medium">メインステ適合</span>
+              <span id="eval-main-match" class="px-2 py-0.5 rounded text-xs font-bold">一致</span>
+            </div>
+            <div class="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex justify-between items-center">
+              <span class="text-slate-400 font-medium">セット適性</span>
+              <span id="eval-set-tier" class="text-slate-200 font-bold">最適</span>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-bold text-slate-400 mb-2">サブステータス有効度 (KQM基準)</h4>
+            <div id="eval-sub-breakdown" class="flex flex-col gap-1.5"></div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80">
+            <h4 class="text-xs font-bold text-amber-300 mb-1">アドバイス</h4>
+            <ul id="eval-advice-list" class="flex flex-col gap-1 text-xs"></ul>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 3: 所持聖遺物インベントリ一覧 -->
+      <section id="section-inventory" class="hidden flex flex-col gap-4">
+        
+        <div class="p-5 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-200 flex items-center gap-1.5">
+                <i data-lucide="package" class="w-4 h-4 text-amber-400"></i>
+                手持ち聖遺物プール一覧
+              </h3>
+              <p class="text-xs text-slate-400">スクショから追加されたすべての聖遺物です。ここから選択キャラの最強ビルドが計算されます。</p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-700 text-slate-400 text-[11px] uppercase tracking-wider">
+                  <th class="py-2 px-3">部位</th>
+                  <th class="py-2 px-3">セット名</th>
+                  <th class="py-2 px-3">メインステータス</th>
+                  <th class="py-2 px-3">サブステータス</th>
+                  <th class="py-2 px-3 text-center">CV</th>
+                  <th class="py-2 px-3 text-right">操作</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- JavaScriptで挿入 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/60 py-4 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+      <p>データ参照元: <a href="https://wikiwiki.jp/genshinwiki/" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:underline font-medium">原神Wiki (wikiwiki.jp/genshinwiki/)</a> キャラクター育成・聖遺物ビルドガイド</p>
+      <p>Powered by Gemini Multimodal Vision & Google DeepMind Agentic Systems.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="kqm_data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>
