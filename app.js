@@ -62,16 +62,18 @@ function populateCharacterOptions() {
   const query = characterSearchQuery.toLowerCase().trim();
   const keys = Object.keys(KQM_CHARACTERS).filter(key => {
     const char = KQM_CHARACTERS[key];
-    // 元素フィルター
-    if (currentElementFilter !== "ALL" && char.element !== currentElementFilter) {
+    // 元素・バージョンフィルター
+    if (currentElementFilter === "V7.1") {
+      if (char.version !== "Ver 7.1") return false;
+    } else if (currentElementFilter !== "ALL" && char.element !== currentElementFilter) {
       return false;
     }
-    // 検索フィルター (名前, 英語名, ロール)
+    // 検索フィルター (名前, ロール, バージョン)
     if (query) {
       const matchName = char.name.toLowerCase().includes(query);
-      const matchEn = char.enName.toLowerCase().includes(query);
       const matchRole = char.role.toLowerCase().includes(query);
-      return matchName || matchEn || matchRole;
+      const matchVer = char.version && char.version.toLowerCase().includes(query);
+      return matchName || matchRole || matchVer;
     }
     return true;
   });
@@ -90,7 +92,8 @@ function populateCharacterOptions() {
     const char = KQM_CHARACTERS[key];
     const option = document.createElement("option");
     option.value = key;
-    option.textContent = `[${char.element}] ${char.name} (${char.enName}) - ${char.role}`;
+    const verBadge = char.version ? `【${char.version}】` : "";
+    option.textContent = `${verBadge}[${char.element}] ${char.name} - ${char.role}`;
     charSelect.appendChild(option);
   });
 

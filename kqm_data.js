@@ -16,7 +16,287 @@ const STAT_MAX_ROLLS = {
 
 const GENSHIN_WIKI_CHARACTERS = {
   // ==========================================
-  // ナタ (Natlan) - 現環境最新
+  // Ver 7.1 最新環境 (ナド・クライ / カーンルイア / スネージナヤ)
+  // ==========================================
+  "flins": {
+    name: "フリンズ",
+    enName: "Flins",
+    element: "Electro",
+    version: "Ver 7.1",
+    iconColor: "#9333ea",
+    role: "メインアタッカー (月感電特化 / ライトキーパー)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%83%95%E3%83%AA%E3%83%B3%E3%82%BA",
+    bestSets: [
+      { name: "天穹の顕現せし夜", pieces: 4, rank: "最適 (専用セット)", desc: "月感電反応ダメージおよび攻撃力を大幅強化。フリンズの圧倒的最適解。" },
+      { name: "黒曜の秘典", pieces: 4, rank: "汎用会心", desc: "夜魂/スタンス切り替え時の会心率+40%。" },
+      { name: "剣闘士のフィナーレ", pieces: 4, rank: "通常攻撃特化", desc: "通常攻撃ダメージ+35%＆攻撃力+18%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["攻撃力%", "雷元素ダメージ"], // 月感電には与ダメバフが乗らない仕様のため攻撃力杯推奨！
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "会心率", "攻撃力%"],
+      tierA: ["元素熟知", "元素チャージ効率"],
+      tierB: ["攻撃力"],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "110-130%",
+    wikiAdvice: "原神Wiki【Ver 7.1】解説：ナド・クライのライトキーパー。『月感電』反応を軸とする超高火力オンフィールドアタッカー。月感電ダメージには通常の元素ダメバフが乗らない仕様のため、杯は雷バフ杯よりも【攻撃力%杯】が推奨されます。攻撃力2000以上を目標にしつつ、会心系を極限まで伸ばすのが鉄則です。"
+  },
+  "dainsleif": {
+    name: "ダインスレイヴ",
+    element: "Geo", // または異界/無属性
+    version: "Ver 7.1",
+    iconColor: "#3b82f6",
+    role: "メインアタッカー (カーンルイアの剣)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%83%80%E3%82%A4%E3%83%B3%E3%82%B9%E3%83%AC%E3%82%A4%E3%83%B4",
+    bestSets: [
+      { name: "黒曜の秘典", pieces: 4, rank: "最適 (会心率40%)", desc: "夜魂/異界の力消費で会心率+40%＆与ダメージ増加。最高峰の会心アタッカーセット。" },
+      { name: "剣闘士のフィナーレ", pieces: 4, rank: "汎用最適", desc: "通常攻撃ダメージ+35%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["攻撃力%", "物理ダメージ"],
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "会心率", "攻撃力%"],
+      tierA: ["元素チャージ効率"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%", "元素熟知"]
+    },
+    erRequirements: "110-130%",
+    wikiAdvice: "原神Wiki【Ver 7.1】解説：カーンルイアの異界の力を振るうメインアタッカー。基礎倍率が極めて高いため、攻撃力%時計・会心ダメージ冠で火力を最大化するのが理論値です。"
+  },
+  "tsaritsa": {
+    name: "ツァリーツァ (氷神)",
+    element: "Cryo",
+    version: "Ver 7.1",
+    iconColor: "#38bdf8",
+    role: "サブアタッカー / 全体バッファー (氷の神)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%B9%E3%83%8D%E3%83%BC%E3%82%B8%E3%83%8A%E3%83%A4",
+    bestSets: [
+      { name: "氷風を彷徨う勇士", pieces: 4, rank: "最適 (凍結・会心率40%)", desc: "敵凍結時に会心率最大+40%。氷神の領域展開と完璧にシナジー。" },
+      { name: "絶縁の旗印", pieces: 4, rank: "爆発サポート", desc: "爆発ダメージ強化と味方へのエネルギー供給。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%", "元素チャージ効率"],
+      goblet: ["氷元素ダメージ"],
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "会心率", "元素チャージ効率"],
+      tierA: ["攻撃力%", "元素熟知 (溶解時)"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "140-160%",
+    wikiAdvice: "原神Wiki【Ver 7.1】解説：スネージナヤを統べる氷の神。チーム全体への強烈な溶解・凍結反応バフと継続追撃を展開。氷風4セットによる会心率+40%を活かして会心ダメージを限界まで盛るのが基本です。"
+  },
+  "capitano": {
+    name: "カピターノ (隊長)",
+    element: "Cryo",
+    version: "Ver 7.1",
+    iconColor: "#0284c7",
+    role: "メインアタッカー (ファデュイ第1位)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%AB%E3%83%94%E3%82%BF%E3%83%BC%E3%83%8E",
+    bestSets: [
+      { name: "黒曜の秘典", pieces: 4, rank: "最適 (第一候補)", desc: "会心率+40%と圧倒的なダメージバフ。最強戦士の一撃火力を最大化。" },
+      { name: "氷風を彷徨う勇士", pieces: 4, rank: "氷特化", desc: "氷元素ダメージ特化。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["氷元素ダメージ", "攻撃力%"],
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "攻撃力%", "会心率"],
+      tierA: ["元素チャージ効率"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%", "元素熟知"]
+    },
+    erRequirements: "110-120%",
+    wikiAdvice: "原神Wiki【Ver 7.1】解説：ファデュイ執行官第1位・テイワット最強の人間。天賦による圧倒的基礎攻撃力を活かし、攻撃力%と会心ダメージに完全特化させます。"
+  },
+  "columbina": {
+    name: "コロンビーナ (少女)",
+    element: "Hydro",
+    version: "Ver 7.1",
+    iconColor: "#0284c7",
+    role: "サポーター / 領域展開バッファー",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%B3%E3%83%AD%E3%83%B3%E3%83%93%E3%83%BC%E3%83%8A",
+    bestSets: [
+      { name: "灰燼の都に立ち栄える勇者", pieces: 4, rank: "最適 (全体40%バフ)", desc: "反応時にチーム全員に対応元素ダメバフ+40%。" },
+      { name: "沈淪の心", pieces: 2, rank: "水元素強化", desc: "水元素ダメージ+15%。" }
+    ],
+    mainStats: {
+      sands: ["元素熟知", "元素チャージ効率"],
+      goblet: ["水元素ダメージ", "元素熟知"],
+      circlet: ["元素熟知", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["元素熟知", "元素チャージ効率 (160-180%)"],
+      tierA: ["HP%", "会心率"],
+      tierB: [],
+      tierTrash: ["攻撃力%", "防御力%"]
+    },
+    erRequirements: "160-180%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：水元素】準拠：第3位の執行官。全元素反応をトリガーにした領域展開バフを展開。元素熟知とチャージ効率を極限まで盛る熟知サポートビルドが推奨です。"
+  },
+  "dottore": {
+    name: "ドットーレ (博士)",
+    element: "Electro",
+    version: "Ver 7.1",
+    iconColor: "#9333ea",
+    role: "サブアタッカー / デバッファー",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%83%89%E3%83%83%E3%83%88%E3%83%BC%E3%83%AC",
+    bestSets: [
+      { name: "絶縁の旗印", pieces: 4, rank: "最適 (爆発火力)", desc: "元素爆発ダメージ最大+75%。" },
+      { name: "黄金の劇団", pieces: 4, rank: "義体スキル追撃", desc: "控えからの義体スキル追撃+70%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%", "元素チャージ効率"],
+      goblet: ["雷元素ダメージ"],
+      circlet: ["会心率", "会心ダメージ"]
+    },
+    substatPriority: {
+      tierS: ["会心率", "会心ダメージ", "攻撃力%"],
+      tierA: ["元素チャージ効率", "元素熟知"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "150-170%",
+    wikiAdvice: "原神Wiki【Ver 7.1】解説：第2位の執行官。義体による多重継続追撃と敵防御力デバフ。爆発を回すチャージ効率と会心率のバランスが重要です。"
+  },
+  "skirk": {
+    name: "スカーク",
+    element: "Cryo",
+    version: "Ver 7.1",
+    iconColor: "#38bdf8",
+    role: "メインアタッカー (深淵剣術)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%B9%E3%82%AB%E3%83%BC%E3%82%AF",
+    bestSets: [
+      { name: "氷風を彷徨う勇士", pieces: 4, rank: "最適 (会心率40%)", desc: "凍結時に会心率+40%。" },
+      { name: "ファントムハンター", pieces: 4, rank: "自傷シナジー", desc: "HP増減と連動して会心率を底上げ。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["氷元素ダメージ"],
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "会心率", "攻撃力%"],
+      tierA: ["元素チャージ効率"],
+      tierB: ["元素熟知"],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "120-140%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：氷元素】準拠：タルタリヤの師匠。深淵の次元斬撃による怒涛の連続氷属性会心攻撃を繰り出すため、攻撃力%時計・氷杯・会心ダメージ冠が最適です。"
+  },
+  "ineffa": {
+    name: "イネファ",
+    element: "Electro",
+    version: "Ver 7.1",
+    iconColor: "#9333ea",
+    role: "サブアタッカー / 月感電サポーター",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%A4%E3%83%8D%E3%83%95%E3%82%A1",
+    bestSets: [
+      { name: "天穹の顕現せし夜", pieces: 4, rank: "最適 (月感電特化)", desc: "月感電反応の頻度とダメージを最大化。" },
+      { name: "黄金の劇団", pieces: 4, rank: "スキル追撃", desc: "控えスキル追撃ダメージ+70%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%", "元素チャージ効率"],
+      goblet: ["雷元素ダメージ", "攻撃力%"],
+      circlet: ["会心率", "会心ダメージ"]
+    },
+    substatPriority: {
+      tierS: ["元素チャージ効率", "会心率", "会心ダメージ"],
+      tierA: ["攻撃力%", "元素熟知"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "160-180%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：雷元素】準拠：フリンズの最高の相棒となる月感電サポーター。天穹4セットを装備して月感電反応を強力に支援します。"
+  },
+  "iansan": {
+    name: "イアンサ",
+    element: "Electro",
+    version: "Ver 7.1",
+    iconColor: "#9333ea",
+    role: "メインアタッカー / ナタ打撃",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%82%A4%E3%82%A2%E3%83%B3%E3%82%B5",
+    bestSets: [
+      { name: "黒曜の秘典", pieces: 4, rank: "最適 (必須級)", desc: "夜魂値消費で会心率+40%。" },
+      { name: "灰燼の都に立ち栄える勇者", pieces: 4, rank: "サポート", desc: "チームへの雷バフ+40%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["雷元素ダメージ"],
+      circlet: ["会心ダメージ", "会心率"]
+    },
+    substatPriority: {
+      tierS: ["会心ダメージ", "会心率", "攻撃力%"],
+      tierA: ["元素チャージ効率", "元素熟知"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%"]
+    },
+    erRequirements: "120-130%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：雷元素】準拠：ナタの夜魂バーストを活かした高速格闘アタッカー。黒曜4セットで会心率40%を確保し、会心ダメージに特化させます。"
+  },
+  "lanyan": {
+    name: "藍硯",
+    element: "Anemo",
+    version: "Ver 7.1",
+    iconColor: "#0d9488",
+    role: "サポーター / 集敵",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E8%97%8D%E7%A1%AF",
+    bestSets: [
+      { name: "翠緑の影", pieces: 4, rank: "最適 (必須級)", desc: "拡散した元素の耐性-40%。" }
+    ],
+    mainStats: {
+      sands: ["元素熟知", "元素チャージ効率"],
+      goblet: ["元素熟知"],
+      circlet: ["元素熟知"]
+    },
+    substatPriority: {
+      tierS: ["元素熟知", "元素チャージ効率"],
+      tierA: ["会心率 (西風時)"],
+      tierB: [],
+      tierTrash: ["攻撃力%", "防御力%", "HP%"]
+    },
+    erRequirements: "160-180%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：風元素】準拠：最新の風サポーター。翠緑4セットによる元素耐性-40%デバフが主軸。トリプル熟知を目指します。"
+  },
+  "varka": {
+    name: "ファルカ (ヴァルカ)",
+    element: "Anemo",
+    version: "Ver 7.1",
+    iconColor: "#0d9488",
+    role: "メインアタッカー (北風の大剣)",
+    wikiUrl: "https://wikiwiki.jp/genshinwiki/%E3%83%95%E3%82%A1%E3%83%AB%E3%82%AB",
+    bestSets: [
+      { name: "辰砂往生録", pieces: 4, rank: "攻撃力特化", desc: "攻撃力最大+66%。大団長の圧倒的パワーを底上げ。" },
+      { name: "剣闘士のフィナーレ", pieces: 4, rank: "通常攻撃特化", desc: "大剣通常攻撃ダメージ+35%。" }
+    ],
+    mainStats: {
+      sands: ["攻撃力%"],
+      goblet: ["風元素ダメージ", "攻撃力%"],
+      circlet: ["会心率", "会心ダメージ"]
+    },
+    substatPriority: {
+      tierS: ["会心率", "会心ダメージ", "攻撃力%"],
+      tierA: ["元素チャージ効率"],
+      tierB: [],
+      tierTrash: ["HP%", "防御力%", "元素熟知"]
+    },
+    erRequirements: "120-130%",
+    wikiAdvice: "原神Wiki【キャラクター一覧：風元素・ファルカ】準拠：西風騎士団大団長・北風の騎士。圧倒的重量打撃を繰り出す風の大剣アタッカー。"
+  },
+
+  // ==========================================
+  // ナタ (Natlan) - Ver 5.x
   // ==========================================
   "xilonen": {
     name: "シロネン",
@@ -1010,6 +1290,21 @@ const INITIAL_INVENTORY = [
     level: 20,
     rarity: 5
   },
+  {
+    id: "inv-3d",
+    slot: "flower",
+    slotName: "生の花",
+    setName: "天穹の顕現せし夜",
+    mainStat: { name: "HP", value: "4,780" },
+    subStats: [
+      { name: "会心ダメージ", value: 21.0 },
+      { name: "会心率", value: 7.0 },
+      { name: "攻撃力%", value: 10.5 },
+      { name: "元素熟知", value: 23 }
+    ],
+    level: 20,
+    rarity: 5
+  },
 
   // 死の羽 (Plume)
   {
@@ -1083,6 +1378,21 @@ const INITIAL_INVENTORY = [
       { name: "元素チャージ効率", value: 11.0 },
       { name: "会心率", value: 6.6 },
       { name: "HP%", value: 9.9 }
+    ],
+    level: 20,
+    rarity: 5
+  },
+  {
+    id: "inv-6d",
+    slot: "plume",
+    slotName: "死の羽",
+    setName: "天穹の顕現せし夜",
+    mainStat: { name: "攻撃力", value: "311" },
+    subStats: [
+      { name: "会心ダメージ", value: 28.0 },
+      { name: "会心率", value: 7.0 },
+      { name: "攻撃力%", value: 9.9 },
+      { name: "元素チャージ効率", value: 5.8 }
     ],
     level: 20,
     rarity: 5
@@ -1164,6 +1474,21 @@ const INITIAL_INVENTORY = [
     level: 20,
     rarity: 5
   },
+  {
+    id: "inv-9d",
+    slot: "sands",
+    slotName: "時の砂",
+    setName: "天穹の顕現せし夜",
+    mainStat: { name: "攻撃力%", value: "46.6%" },
+    subStats: [
+      { name: "会心ダメージ", value: 27.2 },
+      { name: "会心率", value: 7.0 },
+      { name: "元素熟知", value: 42 },
+      { name: "攻撃力", value: 19 }
+    ],
+    level: 20,
+    rarity: 5
+  },
 
   // 空の杯 (Goblet)
   {
@@ -1241,6 +1566,21 @@ const INITIAL_INVENTORY = [
     level: 20,
     rarity: 5
   },
+  {
+    id: "inv-14d",
+    slot: "goblet",
+    slotName: "空の杯",
+    setName: "天穹の顕現せし夜",
+    mainStat: { name: "攻撃力%", value: "46.6%" }, // フリンズ向け月感電特化攻撃力杯！
+    subStats: [
+      { name: "会心ダメージ", value: 28.0 },
+      { name: "会心率", value: 7.4 },
+      { name: "元素熟知", value: 42 },
+      { name: "攻撃力", value: 18 }
+    ],
+    level: 20,
+    rarity: 5
+  },
 
   // 理の冠 (Circlet)
   {
@@ -1314,6 +1654,21 @@ const INITIAL_INVENTORY = [
       { name: "元素チャージ効率", value: 16.8 },
       { name: "会心率", value: 7.0 },
       { name: "防御力", value: 37 }
+    ],
+    level: 20,
+    rarity: 5
+  },
+  {
+    id: "inv-17d",
+    slot: "circlet",
+    slotName: "理の冠",
+    setName: "天穹の顕現せし夜",
+    mainStat: { name: "会心ダメージ", value: "62.2%" },
+    subStats: [
+      { name: "会心率", value: 10.5 },
+      { name: "攻撃力%", value: 14.0 },
+      { name: "元素熟知", value: 23 },
+      { name: "攻撃力", value: 19 }
     ],
     level: 20,
     rarity: 5
